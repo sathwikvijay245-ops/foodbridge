@@ -19,14 +19,16 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# CORS — allow all origins (Vercel, Render, localhost)
+# CORS — wildcard origin is only valid when allow_credentials=False
+# JWT auth uses Authorization header (not cookies) so credentials=False is correct
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 # Global exception handler — logs full traceback for any unhandled error
 @app.exception_handler(Exception)
