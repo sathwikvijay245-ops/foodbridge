@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
@@ -7,7 +7,11 @@ import {
   AlertCircle,
   Utensils,
   HeartHandshake,
-  Shield
+  Shield,
+  Eye,
+  EyeOff,
+  Loader2,
+  Clock
 } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
@@ -16,8 +20,21 @@ export const LoginPage: React.FC = () => {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [slowWarning, setSlowWarning] = useState(false);
+
+  // Show slow-network warning after 5 seconds of loading
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout>;
+    if (loading) {
+      timer = setTimeout(() => setSlowWarning(true), 5000);
+    } else {
+      setSlowWarning(false);
+    }
+    return () => clearTimeout(timer);
+  }, [loading]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,6 +79,17 @@ export const LoginPage: React.FC = () => {
           </p>
         </div>
 
+        {/* Slow backend warning */}
+        {slowWarning && (
+          <div className="p-3 bg-amber-50 border border-amber-200 text-amber-800 text-xs rounded-xl flex items-start gap-2">
+            <Clock className="w-4 h-4 shrink-0 mt-0.5" />
+            <span>
+              <strong>Server is waking up...</strong> The backend sleeps after inactivity on the free plan.
+              Please wait 30–60 seconds — it will connect shortly!
+            </span>
+          </div>
+        )}
+
         {/* 1-Click Demo Evaluation Box */}
         <div className="p-4 bg-slate-900 text-white rounded-2xl shadow-md space-y-3">
           <div className="flex items-center justify-between">
@@ -78,7 +106,7 @@ export const LoginPage: React.FC = () => {
                 key={u.id}
                 onClick={() => handleDemoSignIn(u.id)}
                 disabled={loading}
-                className="w-full text-left px-3 py-2 bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl text-xs transition flex items-center justify-between cursor-pointer"
+                className="w-full text-left px-3 py-2 bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl text-xs transition flex items-center justify-between cursor-pointer disabled:opacity-50"
               >
                 <div className="flex items-center gap-2 truncate">
                   {u.role === 'donor' ? (
@@ -93,7 +121,11 @@ export const LoginPage: React.FC = () => {
                     <span className="text-[10px] text-slate-400">Role: {u.role.toUpperCase()}</span>
                   </div>
                 </div>
-                <span className="text-[10px] text-emerald-400 font-bold shrink-0">Sign in →</span>
+                {loading ? (
+                  <Loader2 className="w-3.5 h-3.5 text-slate-400 animate-spin shrink-0" />
+                ) : (
+                  <span className="text-[10px] text-emerald-400 font-bold shrink-0">Sign in →</span>
+                )}
               </button>
             ))}
           </div>
@@ -123,22 +155,39 @@ export const LoginPage: React.FC = () => {
 
             <div>
               <label className="block font-semibold text-slate-700 mb-1">Password</label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500/40"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  className="w-full px-3 py-2.5 pr-10 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500/40"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 transition"
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-xl font-bold text-xs shadow-xs transition"
+              className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white rounded-xl font-bold text-xs shadow-xs transition flex items-center justify-center gap-2"
             >
-              {loading ? 'Signing in...' : 'Sign In'}
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Signing in...
+                </>
+              ) : (
+                'Sign In'
+              )}
             </button>
           </form>
 
