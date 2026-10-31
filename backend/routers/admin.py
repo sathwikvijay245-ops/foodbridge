@@ -176,3 +176,19 @@ def get_audit_logs(
     current_user: User = Depends(admin_only)
 ):
     return db.query(AuditLog).order_by(AuditLog.timestamp.desc()).limit(limit).all()
+
+@router.post("/reset-database")
+def reset_database(db: Session = Depends(get_db), current_user: User = Depends(admin_only)):
+    """Wipe all data and re-seed the database with fresh demo data. Admin only."""
+    from backend.database import engine, Base
+    from backend.seed_data import seed_database
+
+    # Drop all tables and recreate
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
+
+    # Re-seed
+    seed_database()
+
+    return {"status": "ok", "message": "Database reset and re-seeded with fresh demo data."}
+
