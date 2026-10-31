@@ -13,7 +13,8 @@ import {
 
 const API_BASE = import.meta.env.VITE_API_URL
   ? `${import.meta.env.VITE_API_URL}/api`
-  : '/api';
+  : 'https://foodbridge-5nz2.onrender.com/api';
+
 
 function getToken(): string | null {
   return localStorage.getItem('foodbridge_token');
