@@ -1,0 +1,37 @@
+# Python / Backend
+backend/venv/
+backend/__pycache__/
+backend/routers/__pycache__/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+.env
+*.db
+*.sqlite3
+*.sqlite
+
+# Frontend / Node
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+node_modules/
+dist/
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# OS
+Thumbs.db
+Desktop.ini

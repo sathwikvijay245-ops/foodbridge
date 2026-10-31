@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: foodbridge-api
+    env: python
+    region: oregon
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: uvicorn backend.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        value: sqlite:///./food_donation.db
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 10080
+      - key: ALGORITHM
+        value: HS256
+    healthCheckPath: /api/health
